@@ -33,9 +33,9 @@ def recall(y_true, y_pred, axis=[1,2], smooth=1):
     return recall_coefs[1]
 
 def F1(y_true, y_pred, axis=[1,2], smooth=1):
-    batch_recall_coefs = _F1(y_true, y_pred, axis=axis, smooth=smooth)
-    recall_coefs = K.mean(batch_recall_coefs, axis=0)
-    return recall_coefs[1]
+    batch_F1_coefs = _F1(y_true, y_pred, axis=axis, smooth=smooth)
+    F1_coefs = K.mean(batch_F1_coefs, axis=0)
+    return F1_coefs[1]
 
 
 # ======================================================
@@ -57,9 +57,12 @@ def _recall(y_true, y_pred, axis=None, smooth=1):
     return (true_positive+smooth)/(true_positive+false_negative+smooth)
 
 def _F1(y_true, y_pred, axis=None, smooth=1):
-    precision = _precision(y_true, y_pred, axis=None, smooth=1)
-    recall = _recall(y_true, y_pred, axis=None, smooth=1)
-    return ( 2*precision*recall ) / (precision + recall)
+    y_true_int = K.round(y_true)
+    y_pred_int = K.round(y_pred)
+    true_positive = K.sum(y_true_int * y_pred_int, axis=axis)
+    false_positive = K.sum(y_pred_int, axis=axis) - true_positive
+    false_negative = K.sum(y_true_int, axis=axis) - true_positive
+    return ( 2 * true_positive+smooth) / (2*true_positive + false_negative + false_positive +smooth)
 
 # ======================================================
 
