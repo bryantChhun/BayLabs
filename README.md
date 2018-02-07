@@ -7,10 +7,7 @@ This repository contains code for segmenting the left ventricle of the heart fro
 Dependencies
 simpleitk, scikit-image, scipy, vtk, keras, tensorflow
 
-Download the repo to your drive then run pip install:
-
-	cd repo/path
-	pip install .
+Download the repo to your drive then run script commands from root directory.
 
 # Data
 
