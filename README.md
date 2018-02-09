@@ -4,27 +4,32 @@ This repository contains code for segmenting the left ventricle of the heart fro
 
 
 # Installation
-Dependencies
+Dependencies:
+
 simpleitk, scikit-image, scipy, vtk, keras, tensorflow
 
 Download the repo to your drive then run script commands from root directory.
 
 # Data
 
-Place any patient data folders in the /data directory.  These folders should have a structure like:
+As per agreement with the 2014 CETUS competition, data can't be shared on this repository.  Please go to the competition site, register, sign the data-NDA, then follow the instructions below.
 
-    directory = "./data"
-    directory	/Patient1
-    		/Patient2
-             	/Patient3
+https://www.creatis.insa-lyon.fr/Challenge/CETUS/
+
+Place patient data folders in the /data directory, located at the top level of the repository (or create it). These folders should have a structure like:
+
+    directory = "/data"
+    		/data/Patient1
+    		/data/Patient2
+             	/data/Patient3
 	     	...
              
-      		Patient1/Patient1_frame01.mhd
-      		Patient1/Patient1_frame02.mhd
+      		/data/Patient1/Patient1_frame01.mhd
+      		/data/Patient1/Patient1_frame02.mhd
       		...
-      		Patient1/Patient1_ED_ES_time.txt
-      		Patient1/Patient1_ED_truth.vtk
-      		Patient1/Patient1_ES_truth.vtk
+      		/data/Patient1/Patient1_ED_ES_time.txt
+      		/data/Patient1/Patient1_ED_truth.vtk
+      		/data/Patient1/Patient1_ES_truth.vtk
 
 Data must be preprocessed before running train.  From the root directory, run
 
@@ -32,8 +37,8 @@ Data must be preprocessed before running train.  From the root directory, run
 
 Any image files in data/Patient# directory will be convetred into .npy arrays.  Any .vtk masks in data/Patient# will be converted into binary masks, then into .npy arrays.  Both will be saved to new directories:
 
-	./images
-	./masks
+		/images
+		/masks
 
 Running image preprocessing can take as long as 30 minutes PER MASK.
 
