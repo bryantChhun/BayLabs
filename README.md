@@ -6,7 +6,7 @@ This repository contains code for segmenting the left ventricle of the heart fro
 # Installation
 Dependencies:
 
-simpleitk, scikit-image, scipy, vtk, keras, tensorflow
+simpleitk = 1.0, scikit-image = 0.13, scipy = 0.19, vtk = 7.0, keras, tensorflow
 
 Download the repo to your drive then run script commands from root directory.
 
@@ -35,7 +35,7 @@ Data must be preprocessed before running train.  From the root directory, run
 
 	python image_preprocess.py
 
-Any image files in data/Patient# directory will be convetred into .npy arrays.  Any .vtk masks in data/Patient# will be converted into binary masks, then into .npy arrays.  Both will be saved to new directories:
+Any patient image files in /data directory will be convetred into .npy arrays.  Any patient .vtk masks in /data will be converted into binary masks, then into .npy arrays.  Both will be saved to new directories:
 
 		/images
 		/masks
