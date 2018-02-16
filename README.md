@@ -42,7 +42,7 @@ Any patient image files in /data directory will be convetred into .npy arrays.  
 
 Running image preprocessing can take as long as 30 minutes PER MASK.
 
-# Running models
+# Training models
 
 To train a model, from the root directory run:
 
