@@ -13,7 +13,7 @@ import numpy as np
 from scipy.interpolate import LinearNDInterpolator as plinear
 
 
-def normalize_contour(x, y, z, space_x, space_y, space_z):
+def scale_contour(x, y, z, space_x, space_y, space_z):
     '''
     The spacing values must be parsed out from the .mhd image files, NOT the .vtk meshes
     :param x:

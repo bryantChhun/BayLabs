@@ -9,7 +9,6 @@ Project: Insight_AI_BayLabs
 License: 
 """
 
-import skimage.io as io
 import SimpleITK as sitk
 
 

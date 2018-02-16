@@ -9,7 +9,6 @@ Project: Insight_AI_BayLabs
 License: 
 """
 
-import numpy as np
 import vtk
 from vtk import vtkPolyDataReader
 from vtk.util import numpy_support as ns

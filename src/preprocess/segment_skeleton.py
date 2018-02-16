@@ -20,6 +20,5 @@ def to_binary(image, threshold):
     return binim
 
 def to_skeleton(binim, scale = 255):
-    #print("binim dtype = "+str(binim.dtype))
     skeleton = skeletonize(binim)
     return scale*skeleton

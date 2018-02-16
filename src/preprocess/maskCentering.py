@@ -19,14 +19,14 @@ import numpy as np
 from scipy import signal
 from scipy import ndimage
 from src.preprocess import segment_skeleton as ss
-import matplotlib.pyplot as plt
-from src.dataManager.load_mhd import mhd_to_array
 from src.preprocess.maskCenteringCalibration import mcc
 import re, os, glob
 
 
 def apply_recentering_mask3d(mskVolume, calibrationKey='Patient1_ED', extended_vol = False):
     '''
+    This method pads then shifts mskVolume based on values present in calibrationKey.
+    calibrationKey values should be populated before alignment using methods below.
 
     :param mskVolume:
     :param calibrationKey:
@@ -34,7 +34,6 @@ def apply_recentering_mask3d(mskVolume, calibrationKey='Patient1_ED', extended_v
     :return:
     '''
     mcc_dict = mcc()
-    #out_vol = deepcopy(mskVolume)
     z_tup, y_tup, x_tup = mcc_dict[calibrationKey]
     if extended_vol == True:
         dyr = y_tup[0]+50
@@ -49,48 +48,9 @@ def apply_recentering_mask3d(mskVolume, calibrationKey='Patient1_ED', extended_v
     return out_vol
 
 
-
-def xcorr_2d(input1, input2):
-    '''
-
-    :param input1: target image (2d)
-    :param input2: gaussian filtered contour (2d)
-    :return: cross correlation deltas between target and filtered contour
-    '''
-
-    corr = signal.correlate(input1, input2, mode='same')
-
-    #x-y coordinates of correlation vs center of image
-    new_center_y, new_center_x = np.unravel_index(corr.argmax(), corr.shape)
-    height, width = input1.shape
-    img_center_y = height/2
-    img_center_x = width/2
-    #delta is (X, Y)
-    delta = (img_center_x - new_center_x, img_center_y - new_center_y)
-    return delta
-
-def recenter_mask2d(msk, dx, dy):
-    ''' This method takes scaled 2d contour
-
-    :param msk: scaled 2d mask, but not recentered
-    :param dx: output of 'getMaskCentering'
-    :param dy: output of 'getMaskCentering'
-    :return: mask that is padded with zeros then shifted
-    '''
-    if dx<=0 and dy<=0:
-        shift_msk = np.pad(msk, [(0,abs(dx)), (0,abs(dy))], mode='constant')[abs(dx):, abs(dy):]
-    elif dx>=0 and dy<=0:
-        shift_msk = np.pad(msk, [(abs(dx),0), (0,abs(dy))], mode='constant')[:-abs(dx), abs(dy):]
-    elif dx<=0 and dy>=0:
-        shift_msk = np.pad(msk, [(0,abs(dx)), (abs(dy),0)], mode='constant')[abs(dx):, :-abs(dy)]
-    elif dx>=0 and dy>=0:
-        shift_msk = np.pad(msk, [(abs(dx),0), (abs(dy),0)], mode='constant')[:-abs(dx), :-abs(dy)]
-    assert msk.shape == shift_msk.shape, 'padded/shifted mask is not the same dimension as input mask!'
-
-    return shift_msk
-
 def recenter_mask_3d(msk, dx, dy, dz):
-    ''' This method takes scaled 2d contour
+    '''
+    This method takes scaled 2d contour
 
     :param msk: scaled 3d mask.  shape = (z, y, x)
     :param dx: output of 'getMaskCentering'
@@ -177,8 +137,48 @@ def center_all_masks(image_directory):
 
 ################
 # Methods below search the space for optimal x-y-z shift
+#    Can be used to aid centering of the masks.
 # not implemented for production
 ################
+
+def xcorr_2d(input1, input2):
+    '''
+
+    :param input1: target image (2d)
+    :param input2: gaussian filtered contour (2d)
+    :return: cross correlation deltas between target and filtered contour
+    '''
+
+    corr = signal.correlate(input1, input2, mode='same')
+
+    #x-y coordinates of correlation vs center of image
+    new_center_y, new_center_x = np.unravel_index(corr.argmax(), corr.shape)
+    height, width = input1.shape
+    img_center_y = height/2
+    img_center_x = width/2
+    #delta is (X, Y)
+    delta = (img_center_x - new_center_x, img_center_y - new_center_y)
+    return delta
+
+def recenter_mask2d(msk, dx, dy):
+    ''' This method takes scaled 2d contour
+
+    :param msk: scaled 2d mask, but not recentered
+    :param dx: output of 'getMaskCentering'
+    :param dy: output of 'getMaskCentering'
+    :return: mask that is padded with zeros then shifted
+    '''
+    if dx<=0 and dy<=0:
+        shift_msk = np.pad(msk, [(0,abs(dx)), (0,abs(dy))], mode='constant')[abs(dx):, abs(dy):]
+    elif dx>=0 and dy<=0:
+        shift_msk = np.pad(msk, [(abs(dx),0), (0,abs(dy))], mode='constant')[:-abs(dx), abs(dy):]
+    elif dx<=0 and dy>=0:
+        shift_msk = np.pad(msk, [(0,abs(dx)), (abs(dy),0)], mode='constant')[abs(dx):, :-abs(dy)]
+    elif dx>=0 and dy>=0:
+        shift_msk = np.pad(msk, [(abs(dx),0), (abs(dy),0)], mode='constant')[:-abs(dx), :-abs(dy)]
+    assert msk.shape == shift_msk.shape, 'padded/shifted mask is not the same dimension as input mask!'
+
+    return shift_msk
 
 def getMaskCentering(img, msk, msk_sigma=2, skeleton_threshold = 70, skeleton_sigma = 2):
     '''
@@ -238,7 +238,7 @@ def scan_corr_findz(input1, input2, input2z, sigma=2, skeleton=False, skeleton_s
     '''
     scans through input1's volume, but compares to only one z plane in input2
     this method should output an optimal z shift
-    for thorough testing, try iterating through several input2z planes
+    for thorough testing, try iterating through several input2 z-planes
     :param input1:
     :param input2:
     :param sigma:

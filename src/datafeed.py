@@ -53,15 +53,13 @@ def create_generators(batch_size, train_num, test_num, shuffle=True, normalize_i
     print('=' * 40)
 
     if augment_training:
-        idg = ImageDataGenerator(featurewise_center=True,
-                                 featurewise_std_normalization=True,
-                                 rotation_range=30,
-                                 width_shift_range=0.2,
-                                 height_shift_range=0.2,
-                                 zoom_range=0.2,
-                                 shear_range=0.2,
-                                 horizontal_flip=False)
-        idg.fit(imgs_train)
+        idg = ImageDataGenerator(featurewise_center=False,
+                                 featurewise_std_normalization=False,
+                                 **augmentation_args)
+
+        #use idg.fit only if featurewise_center or featurewise_std_normalization are True
+        #idg.fit(imgs_train)
+
         train_generator = idg.flow(imgs_train, mask_train,
                                    batch_size=batch_size, shuffle=shuffle)
         if validation_on and augment_validation:

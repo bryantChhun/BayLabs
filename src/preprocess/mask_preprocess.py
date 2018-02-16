@@ -92,7 +92,7 @@ class preprocessData(object):
         # load vtk mesh and convert it to a 3d binary mask
         x, y, z = load_vtk.load_vtk(self.vtkfile).T
         space_z, space_y, space_x = self.image_spacing
-        x, y, z = contour_preprocess.normalize_contour(x, y, z, space_x, space_y, space_z)
+        x, y, z = contour_preprocess.scale_contour(x, y, z, space_x, space_y, space_z)
         if self.patient_num in chooseindex:
             mask3d = contour_preprocess.contour_to_mask(x, y, z, self.image_width + 50, self.image_height + 50,
                                                         self.image_zdepth)

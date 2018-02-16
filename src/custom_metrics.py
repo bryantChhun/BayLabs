@@ -11,7 +11,10 @@ License:
 
 from keras import backend as K
 
-#dice is same as F1 is same as Sorensen Dice Coefficient
+# ======================================================
+# methods for batch averaging of metrics
+# return only coefficient representing one of the two classes
+
 def dice(y_true, y_pred):
     batch_dice_coefs = sorensen_dice_(y_true, y_pred, axis=[1, 2])
     dice_coefs = K.mean(batch_dice_coefs, axis=0)
@@ -37,13 +40,19 @@ def F1(y_true, y_pred, axis=[1,2], smooth=1):
     F1_coefs = K.mean(batch_F1_coefs, axis=0)
     return F1_coefs[1]
 
+def F_beta(y_true, y_pred, beta):
+    batch_F_coefs = _F_beta(y_true, y_pred, axis=[1,2], beta=beta)
+    F_coefs = K.mean(batch_F_coefs, axis=0)
+    return F_coefs[1]
+
 
 # ======================================================
+# methods for calculating metrics based off of axis=[1,2]
+# y_true and y_pred should have dimensions: (batch size, height, width, classes)
 
 def _precision(y_true, y_pred, axis=None, smooth=1):
     y_true_int = K.round(y_true)
     y_pred_int = K.round(y_pred)
-    #because y_true is binary, product is the same as intersection
     true_positive = K.sum(y_true_int * y_pred_int, axis=axis)
     false_positive = K.sum(y_pred_int, axis=axis) - true_positive
     return (true_positive+smooth)/(true_positive+false_positive+smooth)
@@ -51,7 +60,6 @@ def _precision(y_true, y_pred, axis=None, smooth=1):
 def _recall(y_true, y_pred, axis=None, smooth=1):
     y_true_int = K.round(y_true)
     y_pred_int = K.round(y_pred)
-    # because y_true is binary, product is the same as intersection
     true_positive = K.sum(y_true_int * y_pred_int, axis=axis)
     false_negative = K.sum(y_true_int, axis=axis) - true_positive
     return (true_positive+smooth)/(true_positive+false_negative+smooth)
@@ -64,7 +72,30 @@ def _F1(y_true, y_pred, axis=None, smooth=1):
     false_negative = K.sum(y_true_int, axis=axis) - true_positive
     return ( 2 * true_positive+smooth) / (2*true_positive + false_negative + false_positive +smooth)
 
+def _F_beta(y_true, y_pred, axis=None, smooth=1, beta=1):
+    '''
+    F beta is the generalized form of the F-score.
+      beta = 1 evenly weighs precision and recall
+      beta = 2 emphasizes recall
+      beta = 0.5 emphasizes precision
+    :param y_true:
+    :param y_pred:
+    :param axis:
+    :param smooth:
+    :param beta:
+    :return:
+    '''
+    y_true_int = K.round(y_true)
+    y_pred_int = K.round(y_pred)
+    true_positive = K.sum(y_true_int * y_pred_int, axis=axis)
+    false_positive = K.sum(y_pred_int, axis=axis) - true_positive
+    false_negative = K.sum(y_true_int, axis=axis) - true_positive
+    prec = (true_positive+smooth)/(true_positive+false_positive+smooth)
+    recall = (true_positive+smooth)/(true_positive+false_negative+smooth)
+    return ( (1+beta**2) * prec * recall + smooth) / ( (beta**2)*prec + recall + smooth)
+
 # ======================================================
+# jaccard is the intersection over the union
 
 def soft_jaccard(y_true, y_pred, axis=None, smooth=1):
     intersection = K.sum(y_true * y_pred, axis=axis)
@@ -81,6 +112,7 @@ def hard_jaccard(y_true, y_pred, axis=None, smooth=1):
 jaccard_ = hard_jaccard
 
 # ======================================================
+# dice is the same as F1, code below could be useful if you choose not to round
 
 def soft_sorensen_dice(y_true, y_pred, axis=None, smooth=1):
     intersection = K.sum(y_true * y_pred, axis=axis)

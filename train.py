@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on 30 January, 2018 @ 10:41 AM
@@ -8,9 +9,6 @@ email: bchhun@gmail.com
 Project: Insight_AI_BayLabs
 License: 
 """
-'''
-
-'''
 
 from __future__ import print_function
 
@@ -52,8 +50,6 @@ def train():
         'shear_range': args.shear_range,
         'zoom_range': args.zoom_range,
         'fill_mode': args.fill_mode,
-        'alpha': args.alpha,
-        'sigma': args.sigma,
     }
     train_generator, train_steps_per_epoch, val_generator, val_steps_per_epoch = datafeed.create_generators(
         args.batch_size, args.train_num, args.test_num,
