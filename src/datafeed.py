@@ -57,9 +57,6 @@ def create_generators(batch_size, train_num, test_num, shuffle=True, normalize_i
                                  featurewise_std_normalization=False,
                                  **augmentation_args)
 
-        #use idg.fit only if featurewise_center or featurewise_std_normalization are True
-        #idg.fit(imgs_train)
-
         train_generator = idg.flow(imgs_train, mask_train,
                                    batch_size=batch_size, shuffle=shuffle)
         if validation_on and augment_validation:

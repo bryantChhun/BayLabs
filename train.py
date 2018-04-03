@@ -21,11 +21,14 @@ import os
 import src.cmdParser as cmd
 import logging
 
-from src import loss, datafeed
+from src import loss, datafeed, custom_metrics
 import src.models as models
 
-
 class metricsHistory(callbacks.Callback):
+    '''
+    contains callbacks for training parameters
+    '''
+
     def on_train_begin(self, logs={}):
         self.losses = []
 
@@ -56,7 +59,6 @@ def train():
         shuffle=args.shuffle,
         normalize_images=args.normalize,
         augment_training=args.augment_training,
-        validation_on=args.validation_on,
         augment_validation=args.augment_validation,
         augmentation_args=augmentation_args)
 
@@ -103,19 +105,26 @@ def train():
 
     #===================== metrics =================================
 
-    def dice(y_true, y_pred):
-        batch_dice_coefs = loss.sorensen_dice(y_true, y_pred, axis=[1, 2])
-        dice_coefs = K.mean(batch_dice_coefs, axis=0)
-        return dice_coefs[1]
+    metrics = []
+    if args.metrics_F1:
+        metrics.append(custom_metrics.F1)
+    if args.metrics_precision:
+        metrics.append(custom_metrics.precision)
+    if args.metrics_recall:
+        metrics.append(custom_metrics.recall)
+    if args.metrics_jaccard:
+        metrics.append(custom_metrics.jaccard)
 
-    def jaccard(y_true, y_pred):
-        batch_jaccard_coefs = loss.jaccard(y_true, y_pred, axis=[1, 2])
-        jaccard_coefs = K.mean(batch_jaccard_coefs, axis=0)
-        return jaccard_coefs[1]
+    #===================== parse for optimizer ====================
 
-    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9)
+    if args.optimizer == 'sgd':
+        opt = optimizers.SGD(lr=args.learning_rate, decay=args.decay, momentum=args.momentum)
+    elif args.optimizer == 'adam':
+        opt = optimizers.adam(lr=args.learning_rate, beta_1=0.9, beta_2=0.999)
+    else:
+        raise Exception("Unknown optimizer ({})".format(args.loss))
 
-    model.compile(loss=lossfunc, optimizer=sgd, metrics=['accuracy', dice, jaccard])
+    model.compile(loss=lossfunc, optimizer=opt, metrics=metrics)
 
     # ========================================================
     # ==================  CallBacks     ======================

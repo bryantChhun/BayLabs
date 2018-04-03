@@ -31,16 +31,21 @@ Place patient data folders in the /data directory, located at the top level of t
       		/data/Patient1/Patient1_ED_truth.vtk
       		/data/Patient1/Patient1_ES_truth.vtk
 
-Data must be preprocessed before running train.  From the root directory, run
+Data must be preprocessed before running train.  There are several stages to the preprocessing:
+1) Convert .vtk segmentation masks to binary masks (ground truth).
+2) Parse timestamp to match .vtk masks and image data, use simple unsupervised methods to align the .vtk binary masks to data, then save as a calibration file.
+3) Use calibration file to align masks/data, then save as .npy arrays for training.
+
+From the root directory, run
 
 	python image_preprocess.py
 
-Any patient image files in /data directory will be convetred into .npy arrays.  Any patient .vtk masks in /data will be converted into binary masks, then into .npy arrays.  Both will be saved to new directories:
+Any patient image files and .vtk masks in /data directory will be converted into .npy arrays.  Both will be saved to new directories:
 
-		/images
-		/masks
+	/images
+	/masks
 
-Running image preprocessing can take as long as 30 minutes PER MASK.
+Running image preprocessing can take some time.
 
 # Running models
 

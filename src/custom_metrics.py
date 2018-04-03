@@ -78,12 +78,6 @@ def _F_beta(y_true, y_pred, axis=None, smooth=1, beta=1):
       beta = 1 evenly weighs precision and recall
       beta = 2 emphasizes recall
       beta = 0.5 emphasizes precision
-    :param y_true:
-    :param y_pred:
-    :param axis:
-    :param smooth:
-    :param beta:
-    :return:
     '''
     y_true_int = K.round(y_true)
     y_pred_int = K.round(y_pred)
