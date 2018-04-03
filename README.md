@@ -45,9 +45,13 @@ Any patient image files and .vtk masks in /data directory will be converted into
 	/images
 	/masks
 
+<<<<<<< HEAD
 Running image preprocessing can take some time.
+=======
+Running image preprocessing can take some time depending on the number of masks.
+>>>>>>> 6754f2721b380c9188087e84786202fd6215cfdd
 
-# Running models
+# Training models
 
 To train a model, from the root directory run:
 
